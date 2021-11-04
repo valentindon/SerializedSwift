@@ -78,7 +78,7 @@ extension Serialized: DecodableProperty where T: Decodable {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         if T.self is AnyTypeOfArray.Type, let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
-        }else if let value = try? container.decodeIfPresent(T.self, forKey: codingKey) {
+        }else if let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
         } else {
             guard let altKey = alternateKey else { return }
@@ -197,7 +197,7 @@ extension SerializedDecodable: DecodableProperty where T: Decodable {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         if T.self is AnyTypeOfArray.Type, let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
-        }else if let value = try? container.decodeIfPresent(T.self, forKey: codingKey) {
+        }else if let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
         } else {
             guard let altKey = alternateKey else { return }
