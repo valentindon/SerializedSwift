@@ -240,11 +240,47 @@ final class SerializedBasicSwiftTests: XCTestCase {
         }
     }
     
+    func testIntDoubleValuesPresent() {
+        struct IntDouble: Serializable {
+            @Serialized()
+            var intField: Int
+            @Serialized()
+            var doubleField: Double
+        }
+        
+        let json = """
+          {
+              "intField": 10,
+              "doubleField": 20
+          }
+          """
+        
+        guard let data = json.data(using: .utf8) else {
+            XCTFail()
+            return
+        }
+        
+        do {
+            let object = try JSONDecoder().decode(IntDouble.self, from: data)
+            
+            XCTAssertEqual(object.intField, 10)
+            
+            let json = try JSONEncoder().encode(object)
+            let newObject = try JSONDecoder().decode(IntDouble.self, from: json)
+            
+            XCTAssertEqual(newObject.doubleField, 20)
+            
+        } catch {
+            XCTFail()
+        }
+    }
+    
     static var allTests = [
         ("testBasicJSONDecode", testBasicJSONDecode),
         ("testInheritance", testInheritance),
         ("testComposition", testComposition),
         ("testAlternateKey", testAlternateKey),
-        ("testAlternateKeyAndPrimaryKeyBothPresent", testAlternateKeyAndPrimaryKeyBothPresent)
+        ("testAlternateKeyAndPrimaryKeyBothPresent", testAlternateKeyAndPrimaryKeyBothPresent),
+        ("testIntDoubleValuesPresent", testIntDoubleValuesPresent)
     ]
 }

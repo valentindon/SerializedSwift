@@ -197,7 +197,26 @@ extension SerializedDecodable: DecodableProperty where T: Decodable {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         if T.self is AnyTypeOfArray.Type, let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
-        }else if let value = try? container.decode(T.self, forKey: codingKey) {
+        } else if T.self is Int.Type {
+            do {
+                let value = try container.decode(T.self, forKey: codingKey)
+                wrappedValue = value
+            } catch {
+                if let value = Int(try container.decode(Double.self, forKey: codingKey)) as? T   {
+                    wrappedValue = value
+                }
+            }
+        } else if T.self is Double.Type {
+            do {
+                let value = try container.decode(T.self, forKey: codingKey)
+                wrappedValue = value
+            } catch {
+                if let value = Double(try container.decode(Int.self, forKey: codingKey)) as? T {
+                    wrappedValue = value
+                }
+                
+            }
+        } else if let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
         } else {
             guard let altKey = alternateKey else { return }
