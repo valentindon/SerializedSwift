@@ -4,7 +4,7 @@
 //
 //  Created by Dejan Skledar on 07/09/2020.
 //
-
+// Custom brunch only for CBOR
 import Foundation
 
 public typealias Serializable = SerializableEncodable & SerializableDecodable
