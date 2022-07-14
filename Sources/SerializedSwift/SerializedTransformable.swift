@@ -39,7 +39,7 @@ extension SerializedTransformable: EncodableProperty where T.From: Encodable {
 }
 
 // Decodable support
-extension SerializedTransformable: DecodableProperty where T.From: Decodable {
+extension SerializedTransformable: DecodableProperty where T.From: Decodable, T.To: Decodable {
     
     /// Property decoding using the Transformable object. Firstly the JSON object is decoded as per T.From type, then it is transformed to the T.To type
     /// using the `transformFromJSON` method.
@@ -52,10 +52,18 @@ extension SerializedTransformable: DecodableProperty where T.From: Decodable {
         
         if let value = try? container.decodeIfPresent(T.From.self, forKey: codingKey) {
             self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decodeIfPresent(T.To.self, forKey: codingKey) {
+            self.wrappedValue = value
         } else if let altKey = alternateKey {
             let altCodingKey = SerializedCodingKeys(key: altKey)
-            let value = try? container.decodeIfPresent(T.From.self, forKey: altCodingKey)
-            self.wrappedValue = T.transformFromJSON(value: value)
+            if let value = try? container.decodeIfPresent(T.From.self, forKey: altCodingKey) {
+                self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decodeIfPresent(T.To.self, forKey: altCodingKey) {
+                self.wrappedValue = value
+            } else {
+                self.wrappedValue = T.transformFromJSON(value: nil)
+            }
+            
         } else {
             self.wrappedValue = T.transformFromJSON(value: nil)
         }
