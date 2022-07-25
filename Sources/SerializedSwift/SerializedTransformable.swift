@@ -50,14 +50,22 @@ extension SerializedTransformable: DecodableProperty where T.From: Decodable, T.
     public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
-        if let value = try? container.decodeIfPresent(T.From.self, forKey: codingKey) {
+        if let value = try? container.decode(T.From.self, forKey: codingKey) {
             self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decodeIfPresent(T.From.self, forKey: codingKey) {
+            self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decode(T.To.self, forKey: codingKey) {
+            self.wrappedValue = value
         } else if let value = try? container.decodeIfPresent(T.To.self, forKey: codingKey) {
             self.wrappedValue = value
         } else if let altKey = alternateKey {
             let altCodingKey = SerializedCodingKeys(key: altKey)
-            if let value = try? container.decodeIfPresent(T.From.self, forKey: altCodingKey) {
+            if let value = try? container.decode(T.From.self, forKey: codingKey) {
                 self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decodeIfPresent(T.From.self, forKey: altCodingKey) {
+                self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decode(T.To.self, forKey: codingKey) {
+                self.wrappedValue = value
             } else if let value = try? container.decodeIfPresent(T.To.self, forKey: altCodingKey) {
                 self.wrappedValue = value
             } else {
