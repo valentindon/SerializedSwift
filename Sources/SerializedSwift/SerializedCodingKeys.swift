@@ -13,7 +13,7 @@ import Foundation
 ///
 ///
 
-public struct SerializedCodingKeys: CodingKey {
+public struct SerializedCodingKeys: CodingKey, Hashable {
     public var stringValue: String
     public var intValue: Int?
 
@@ -21,7 +21,7 @@ public struct SerializedCodingKeys: CodingKey {
         stringValue = key
     }
     
-    public init?(stringValue: String) {
+    public init(stringValue: String) {
         self.stringValue = stringValue
     }
 
@@ -29,4 +29,23 @@ public struct SerializedCodingKeys: CodingKey {
         self.intValue = intValue
         self.stringValue = String(intValue)
     }
+}
+
+extension SerializedCodingKeys: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+       stringValue = value
+    }
+}
+
+extension SerializedCodingKeys {
+  /// A textual representation of this key.
+  public var description: String {
+    let intValue = self.intValue?.description ?? "nil"
+    return "\(type(of: self))(stringValue: \"\(stringValue)\", intValue: \(intValue))"
+  }
+
+  /// A textual representation of this key, suitable for debugging.
+  public var debugDescription: String {
+    return description
+  }
 }

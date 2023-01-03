@@ -175,7 +175,7 @@ final class SerializedBasicSwiftTests: XCTestCase {
             
             required init() {}
         }
-        let json = """
+        let jsonString = """
           {
               "full_name": "Foo Bar",
               "town": "Maribor",
@@ -183,7 +183,7 @@ final class SerializedBasicSwiftTests: XCTestCase {
           }
           """
         
-        guard let data = json.data(using: .utf8) else {
+        guard let data = jsonString.data(using: .utf8) else {
             XCTFail()
             return
         }
@@ -201,7 +201,14 @@ final class SerializedBasicSwiftTests: XCTestCase {
             XCTAssertEqual(newObject.name, "Foo Bar")
             XCTAssertEqual(newObject.post, "Maribor")
             XCTAssertEqual(newObject.score, 10)
+           
             
+            guard let newJsonString = String(data: json, encoding: .utf8) else {
+                XCTFail()
+                return
+            }
+            print(jsonString, newJsonString)
+
         } catch {
             XCTFail()
         }

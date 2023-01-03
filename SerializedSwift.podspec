@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "SerializedSwift"
-  spec.version      = "0.2.5"
+  spec.version      = "0.2.6"
   spec.summary      = "A GSON inspired JSON decoding strategy in Swift using @propertyWrappers."
 
   # This description is used to generate tags and improve search results.
@@ -135,5 +135,5 @@ Pod::Spec.new do |spec|
 
   # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
   # spec.dependency "JSONKit", "~> 1.4"
-
+  spec.dependency "Runtime"
 end

@@ -6,14 +6,14 @@
 //
 
 import Foundation
-
+import Runtime
 //
 //
 /// SerializableEncodable protocol to be used for Encoding only
 //
 //
 
-public protocol SerializableEncodable: Encodable {}
+public protocol SerializableEncodable: Encodable, KeyValueCoding {}
 
 //
 //
@@ -27,7 +27,8 @@ public extension SerializableEncodable {
     /// Encodes all properties wrapped with `SerializableEncodable` (or `Serialized`)
     /// - Parameter encoder: The default encoder
     /// - Throws: Throws JSON Encoding error
-    func encode(to encoder: Encoder) throws {
+    //V3
+    func encodeOriginal(to encoder: Encoder) throws {
         // Get the container keyed by the SerializedCodingKeys defined by the propertyWrapper @Serialized
         var container = encoder.container(keyedBy: SerializedCodingKeys.self)
         
@@ -52,5 +53,64 @@ public extension SerializableEncodable {
             }
             mirror = mirror?.superclassMirror
         } while mirror != nil
+    }
+    
+    //V4
+    func encodeKVC(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: SerializedCodingKeys.self)
+       
+        let metadata = self.metadata
+        let properties = metadata.properties
+       
+    
+        try properties.forEach { property in
+            var this = self
+            let keyName = property.name
+            
+            guard let encodableProperty = this[keyName] as? EncodableProperty else {
+                return
+            }
+            
+            let propertyName = keyName.hasPrefix("_") ? String(keyName.dropFirst()) : keyName
+
+            try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+
+        }
+    }
+    
+    func encodeRuntime(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: SerializedCodingKeys.self)
+       
+        let info = try typeInfo(of: type(of: self))
+        for property in info.properties {
+            guard let encodableProperty = try? property.get(from: self) as? EncodableProperty else {continue}
+            let propertyName = String( property.name.dropFirst())
+            try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+        }
+    }
+    
+    func encodeBridge(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: SerializedCodingKeys.self)
+       
+        let info = try typeInfo(of: type(of: self))
+        for property in info.properties {
+            guard let encodableProperty = try? property.get(from: self) as? EncodableProperty else {continue}
+            let propertyName = String( property.name.dropFirst())
+            try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+        }
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        switch kindLib{
+            case .Mirror:
+                try self.encodeOriginal(to: encoder)
+            case .KVC:
+                try self.encodeOriginal(to: encoder)
+            case .Runtime:
+                try self.encodeRuntime(to: encoder)
+            case .Bridge:
+                try self.encodeBridge(to: encoder)
+        }
+        
     }
 }

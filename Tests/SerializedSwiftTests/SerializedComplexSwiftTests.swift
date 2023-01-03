@@ -11,7 +11,7 @@ import XCTest
 final class SerializedRequiredSwiftTests: XCTestCase {
     
     func testDictionary() {
-        class Foo: Serializable {
+        final class Foo: Serializable {
             @Serialized
             var bar: [String: String]
             
@@ -52,7 +52,7 @@ final class SerializedRequiredSwiftTests: XCTestCase {
     }
     
     func testArray() {
-        class Foo: Serializable {
+        final class Foo: Serializable {
             @Serialized
             var foo: [String]
             
@@ -98,7 +98,7 @@ final class SerializedRequiredSwiftTests: XCTestCase {
     }
     
     func testNonSerializableButCodableComposition() {
-        class Foo: Serializable {
+        final class Foo: Serializable {
             @Serialized
             var foo: String
             
