@@ -121,21 +121,29 @@ public struct Metadata {
         guard kind == .class || kind == .struct else {
             return []
         }
-        
+
         let count = swift_reflectionMirror_recursiveCount(type)
         var fieldMetadata = _FieldReflectionMetadata()
         return (0..<count).compactMap {
             let propertyType = swift_reflectionMirror_recursiveChildMetadata(type, index: $0, fieldMetadata: &fieldMetadata)
             defer { fieldMetadata.freeFunc?(fieldMetadata.name) }
-            
+            print("propertyType", propertyType)
+            let propertyKind = Kind.kind(of: propertyType)
+            guard propertyKind == .class || propertyKind == .struct else {
+                return nil
+            }
             let offset = swift_reflectionMirror_recursiveChildOffset(type, index: $0)
             let propertyName = String(cString: fieldMetadata.name!)
-//            print("propertyName: ", propertyName)
-            return Property(name: propertyName,
+            print("propertyName: ", propertyName)
+            
+            let metadata = swift_metadata(of: propertyType)
+            
+            let property = Property(name: propertyName,
                             isStrong: fieldMetadata.isStrong,
                             isVar: fieldMetadata.isVar,
                             offset: offset,
-                            metadata: swift_metadata(of: propertyType))
+                            metadata: metadata)
+            return property
         }
     }
     
@@ -188,15 +196,11 @@ class MetadataCache {
         synchronized(self) {
             let key = String(describing: type)
             let hashedType = HashedType(type)
-//            print("check exist type: ", key)
             guard let metadata = cache[hashedType] else {
-//                print("added new metadata: ", key)
                 let metadata = Metadata(type: type)
                 cache[hashedType] = metadata
-//                print("cache count: ", cache.count)
                 return metadata
             }
-//            print("type exist: ", key)
             return metadata
         }
     }

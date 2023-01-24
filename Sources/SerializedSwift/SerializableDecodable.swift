@@ -15,9 +15,10 @@ import Runtime
 //
 //
 
-public protocol SerializableDecodable: Decodable, KeyValueCoding {
+public protocol SerializableDecodable: Decodable, KeyValueCoding  {
     init()
     func decode(from decoder: Decoder) throws
+    
 }
 
 //
@@ -61,20 +62,10 @@ public extension SerializableDecodable {
             mirror = mirror?.superclassMirror
         } while mirror != nil
     }
+    
     //V4
-    typealias DecodeFunc = (KeyedDecodingContainer<SerializedCodingKeys>, SerializedCodingKeys) throws -> Void
-    
-    
-    //    static func decodeProperty<T: DecodableProperty>( property: DecodableProperty, propertyName: String) -> (type: DecodableProperty.Type, f: DecodeFunc)  {
-    //
-    //        (property.self, {
-    //            try property.decodeValue(from: $0, propertyName: $1.stringValue)
-    //        })
-    //    }
-    
     func decodeKVC(from decoder: Decoder) throws {
         
-//        let queue = DispatchQueue(label:Bundle.main.bundleIdentifier! + ".SerializableDecodable.concurrentScheduler", qos: .default, attributes: .concurrent)
         // Get the container keyed by the SerializedCodingKeys defined by the propertyWrapper @Serialized
         let container = try decoder.container(keyedBy: SerializedCodingKeys.self)
         
@@ -113,7 +104,7 @@ public extension SerializableDecodable {
                 guard case let .some(propertyValue) = propertyValue else {
                     return
                 }
-                print("propertyValue:", propertyValue)
+                
                 guard  let decodableProperty = propertyValue as? DecodableProperty else {
                     return
                 }
@@ -133,16 +124,12 @@ public extension SerializableDecodable {
          
         let info = try RuntimeCache.shared.typeInfo(of: type(of: self))
         for property in info.properties {
-            var startTime = CFAbsoluteTimeGetCurrent()
-           
             guard let decodableProperty = try? property.get(from: self) as? DecodableProperty else {continue}
-            var timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-//            print("propertyName get:",  property.name, timeElapsed)
+
             let propertyName = String( property.name.dropFirst())
-            startTime = CFAbsoluteTimeGetCurrent()
+
             try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-            timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-//            print("propertyName set:",  property.name, timeElapsed)
+
         }
     
     
@@ -199,6 +186,7 @@ public extension SerializableDecodable {
         self.init()
         try decode(from: decoder)
     }
+    
 }
  
 @discardableResult

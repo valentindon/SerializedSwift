@@ -19,12 +19,15 @@ public typealias Serializable = SerializableEncodable & SerializableDecodable
 
 protocol AnyTypeOfArray {}
 extension Array: AnyTypeOfArray {}
-
+protocol SerializedProtocol {
+    var key: String? {get set}
+    var alternateKey: String? {get set}
+}
 @propertyWrapper
 /// Property wrapper for Serializable (Encodable + Decodable) properties.
 /// The Object itself must conform to Serializable (or SerializableEncodable / SerializableDecodable)
 /// Default value is by default nil. Can be used directly without arguments
-public final class Serialized<T> {
+public final class Serialized<T>:SerializedProtocol {
     var key: String?
     var alternateKey: String?
     
@@ -83,12 +86,14 @@ extension Serialized: DecodableProperty where T: Decodable {
     ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
     /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
     public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
         if  let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value
         } else if T.self is Double.Type, let intValue = try? container.decode(Int.self, forKey: codingKey), let value = Double(intValue) as? T {
             wrappedValue = value
-        } else if let value = try? container.decode(T.self, forKey: codingKey) {
+        } else if T.self is Double.Type, let floatValue = try? container.decode(Float.self, forKey: codingKey), let value = Double(floatValue) as? T {
             wrappedValue = value
         } else {
             guard let altKey = alternateKey else { return }
@@ -104,8 +109,15 @@ extension Serialized: DecodableProperty where T: Decodable {
 //            wrappedValue = value
 //        } else if T.self is Int.Type, let doubleValue = try? container.decode(Double.self, forKey: codingKey), let value = Int(doubleValue) as? T   {
 //            wrappedValue = value
-//        } else if T.self is Double.Type, let value = try? container.decode(T.self, forKey: codingKey) {
-//            wrappedValue = value
+//        } else if T.self is Double.Type  {
+//            if let doubleValue = try? container.decode(Double.self, forKey: codingKey), let value = Double(doubleValue) as? T {
+//                wrappedValue = value
+//            } else if let floatValue = try? container.decode(Float.self, forKey: codingKey), let value = Double(floatValue) as? T {
+//                wrappedValue = value
+//            } else if let intValue = try? container.decode(Int.self, forKey: codingKey),let value = Double(intValue) as? T {
+//                wrappedValue = value
+//            }
+//
 //        } else if T.self is Double.Type, let intValue = try? container.decode(Int.self, forKey: codingKey), let value = Double(intValue) as? T {
 //            wrappedValue = value
 //        } else if let value = try? container.decode(T.self, forKey: codingKey) {
@@ -117,20 +129,9 @@ extension Serialized: DecodableProperty where T: Decodable {
 //                wrappedValue = value
 //            }
 //        }
+        
     }
 
-//    public init(from decoder: Decoder) throws {
-//
-//        let singleContainer = try decoder.singleValueContainer()
-//        let singleKey = singleContainer.codingPath.first!
-//
-//        if let value = try? singleContainer.decode(T.self) {
-//            wrappedValue = value
-//        } else if let dictValue = try? singleContainer.decode([String: T].self), let value = dictValue[singleKey.stringValue]  {
-//            wrappedValue = value
-//        }
-//
-//    }
 }
 
 
