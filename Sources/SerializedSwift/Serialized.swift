@@ -19,17 +19,19 @@ public typealias Serializable = SerializableEncodable & SerializableDecodable
 
 protocol AnyTypeOfArray {}
 extension Array: AnyTypeOfArray {}
-protocol SerializedProtocol {
-    var key: String? {get set}
-    var alternateKey: String? {get set}
+public protocol SerializedProtocol {
+    var key: String? {get}
+    var alternateKey: String? {get}
+    func getType<T>()-> T.Type
 }
+
 @propertyWrapper
 /// Property wrapper for Serializable (Encodable + Decodable) properties.
 /// The Object itself must conform to Serializable (or SerializableEncodable / SerializableDecodable)
 /// Default value is by default nil. Can be used directly without arguments
 public final class Serialized<T>:SerializedProtocol {
-    var key: String?
-    var alternateKey: String?
+    public private(set)var key: String?
+    public private(set)var alternateKey: String?
     
     private var _value: T?
     
@@ -49,6 +51,10 @@ public final class Serialized<T>:SerializedProtocol {
         } set {
             _value = newValue
         }
+    }
+    
+    public func getType<T>() -> T.Type {
+        return T.self
     }
     
     /// Defualt init for Serialized wrapper
