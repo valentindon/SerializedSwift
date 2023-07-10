@@ -124,12 +124,13 @@ public extension SerializableDecodable {
          
         let info = try RuntimeCache.shared.typeInfo(of: type(of: self))
         for property in info.properties {
-            guard let decodableProperty = try? property.get(from: self) as? DecodableProperty else {continue}
-
+            guard let rawProperty = try? property.get(from: self) else {continue}
             let propertyName = String( property.name.dropFirst())
-
-            try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-
+            if let decodableProperty = rawProperty as? DecodableProperty {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
+            }else if let decodableProperty = rawProperty as? DictionaryDecodableProperty {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
+            }
         }
     
     

@@ -83,9 +83,15 @@ public extension SerializableEncodable {
        
         let info = try typeInfo(of: type(of: self))
         for property in info.properties {
-            guard let encodableProperty = try? property.get(from: self) as? EncodableProperty else {continue}
+            guard let rawProperty = try? property.get(from: self) else {continue}
             let propertyName = String( property.name.dropFirst())
-            try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            if let encodableProperty = rawProperty as? EncodableProperty {
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }else if let encodableProperty = rawProperty as? DictionaryEncodableProperty {
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }else if let encodableProperty = rawProperty as? OptionalDictionaryEncodableProperty {
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }
         }
     }
     
@@ -94,9 +100,16 @@ public extension SerializableEncodable {
        
         let info = try typeInfo(of: type(of: self))
         for property in info.properties {
-            guard let encodableProperty = try? property.get(from: self) as? EncodableProperty else {continue}
+            guard let rawEncodableProperty = try? property.get(from: self) else {continue}
             let propertyName = String( property.name.dropFirst())
-            try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            if let encodableProperty = rawEncodableProperty as? EncodableProperty {
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }else if let encodableProperty = rawEncodableProperty as? DictionaryEncodableProperty {
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }
+            
+            
+            
         }
     }
     

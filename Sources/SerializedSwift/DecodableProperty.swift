@@ -15,6 +15,15 @@ import Foundation
 
 public protocol DecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
-    
+    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+}
+
+public protocol DictionaryDecodableProperty {
+    typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
+    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+}
+
+public protocol OptionalDictionaryDecodableProperty {
+    typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
     func decodeValue(from container: DecodeContainer, propertyName: String) throws
 }

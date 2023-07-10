@@ -83,6 +83,26 @@ extension Serialized: EncodableProperty where T: Encodable {
     }
 }
 
+// Реализация для поддержки Dictionary<String, Any>
+extension Serialized: DictionaryEncodableProperty  where T == Dictionary<String, Any> {
+    public func encodeValue(from container: inout EncodeContainer, propertyName: String) throws {
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        try container.encodeIfPresent(wrappedValue, forKey: codingKey)
+    }
+    
+   
+}
+
+// Реализация для поддержки Optional<Dictionary<String, Any>>
+extension Serialized: OptionalDictionaryEncodableProperty where T == Dictionary<String, Any>? {
+    public func encodeValue(from container: inout EncodeContainer, propertyName: String) throws {
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        try container.encodeIfPresent(wrappedValue, forKey: codingKey)
+    }
+    
+   
+}
+
 /// Decodable support
 extension Serialized: DecodableProperty where T: Decodable {
     
@@ -140,6 +160,48 @@ extension Serialized: DecodableProperty where T: Decodable {
 
 }
 
+/// Decodable support
+extension Serialized: DictionaryDecodableProperty where T == Dictionary<String, Any>, T.Key == String {
+    
+    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
+        if  let value = try? container.decode(T.self, forKey: codingKey) {
+            wrappedValue = value
+        }  else {
+            guard let altKey = alternateKey else { return }
+            let altCodingKey = SerializedCodingKeys(key: altKey)
+            if let value = try? container.decodeIfPresent(T.self, forKey: altCodingKey) {
+                wrappedValue = value
+            }
+        }
+        
+       
+    }
+
+}
+
+extension Serialized: OptionalDictionaryDecodableProperty where T == Dictionary<String, Any>? {
+    
+    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
+        if  let value = try? container.decodeIfPresent([String: Any].self, forKey: codingKey) {
+            wrappedValue = value
+        }  else {
+            guard let altKey = alternateKey else { return }
+            let altCodingKey = SerializedCodingKeys(key: altKey)
+            if let value = try? container.decodeIfPresent([String: Any].self, forKey: altCodingKey) {
+                wrappedValue = value
+            }
+        }
+        
+       
+    }
+
+}
 
 @propertyWrapper
 /// Property wrapper for Serializable (Encodable + Decodable) properties.

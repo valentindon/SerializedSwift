@@ -282,6 +282,49 @@ final class SerializedBasicSwiftTests: XCTestCase {
         }
     }
     
+    func testAnyValuesPresent() {
+        struct MockIfPresentObject: Serializable {
+            @Serialized(default: nil)
+            var dict: [String: Any]?
+            
+//            @Serialized(default: nil)
+//            var array: [Any]?
+            
+        }
+        
+        let json = """
+          {
+              "dict": {"intField": 20, "doubleField": 21},
+              "array": [10, 20, 25.3]
+          }
+          """
+        
+        guard let data = json.data(using: .utf8) else {
+            XCTFail()
+            return
+        }
+        
+        guard let string = String(data: data, encoding: .utf8) else {
+            XCTFail()
+            return
+        }
+        print(string)
+        
+        do {
+            let object = try JSONDecoder().decode(MockIfPresentObject.self, from: data)
+            
+//            XCTAssertEqual(object.dict, 10)
+            
+            let json = try JSONEncoder().encode(object)
+            let newObject = try JSONDecoder().decode(MockIfPresentObject.self, from: json)
+            
+            XCTAssertEqual(newObject.dict?["doubleField"] as? Double, object.dict?["doubleField"] as? Double)
+            
+        } catch(let error) {
+            XCTFail(error.localizedDescription)
+        }
+    }
+    
     static var allTests = [
         ("testBasicJSONDecode", testBasicJSONDecode),
         ("testInheritance", testInheritance),

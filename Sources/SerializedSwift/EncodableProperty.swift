@@ -18,3 +18,16 @@ public protocol EncodableProperty {
 
     func encodeValue(from container: inout EncodeContainer, propertyName: String) throws
 }
+
+
+public protocol DictionaryEncodableProperty {
+    typealias EncodeContainer = KeyedEncodingContainer<SerializedCodingKeys>
+
+    func encodeValue(from container: inout EncodeContainer, propertyName: String) throws
+}
+
+public protocol OptionalDictionaryEncodableProperty {
+    typealias EncodeContainer = KeyedEncodingContainer<SerializedCodingKeys>
+
+    func encodeValue(from container: inout EncodeContainer, propertyName: String) throws
+}
