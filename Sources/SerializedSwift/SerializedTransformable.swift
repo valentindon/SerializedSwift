@@ -77,3 +77,82 @@ extension SerializedTransformable: DecodableProperty where T.From: Decodable, T.
         }
     }
 }
+
+extension SerializedTransformable: DictionaryDecodableProperty where T.From: Decodable, T.To == [String: Any] {
+    
+    /// Property decoding using the Transformable object. Firstly the JSON object is decoded as per T.From type, then it is transformed to the T.To type
+    /// using the `transformFromJSON` method.
+    /// - Parameters:
+    ///   - container: The decoding container
+    ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
+    /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
+    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
+        if let value = try? container.decode(T.From.self, forKey: codingKey) {
+            self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decodeIfPresent(T.From.self, forKey: codingKey) {
+            self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decode(T.To.self, forKey: codingKey) {
+            self.wrappedValue = value
+        } else if let value = try? container.decodeIfPresent(T.To.self, forKey: codingKey) {
+            self.wrappedValue = value
+        } else if let altKey = alternateKey {
+            let altCodingKey = SerializedCodingKeys(key: altKey)
+            if let value = try? container.decode(T.From.self, forKey: codingKey) {
+                self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decodeIfPresent(T.From.self, forKey: altCodingKey) {
+                self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decode(T.To.self, forKey: codingKey) {
+                self.wrappedValue = value
+            } else if let value = try? container.decodeIfPresent(T.To.self, forKey: altCodingKey) {
+                self.wrappedValue = value
+            } else {
+                self.wrappedValue = T.transformFromJSON(value: nil)
+            }
+            
+        } else {
+            self.wrappedValue = T.transformFromJSON(value: nil)
+        }
+    }
+}
+
+
+extension SerializedTransformable: OptionalDictionaryDecodableProperty where T.From: Decodable, T.To == [String: Any]? {
+    
+    /// Property decoding using the Transformable object. Firstly the JSON object is decoded as per T.From type, then it is transformed to the T.To type
+    /// using the `transformFromJSON` method.
+    /// - Parameters:
+    ///   - container: The decoding container
+    ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
+    /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
+    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
+        if let value = try? container.decode(T.From.self, forKey: codingKey) {
+            self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decodeIfPresent(T.From.self, forKey: codingKey) {
+            self.wrappedValue = T.transformFromJSON(value: value)
+        } else if let value = try? container.decode([String:Any].self, forKey: codingKey) {
+            self.wrappedValue = value
+        } else if let value = try? container.decodeIfPresent([String:Any].self, forKey: codingKey) {
+            self.wrappedValue = value
+        } else if let altKey = alternateKey {
+            let altCodingKey = SerializedCodingKeys(key: altKey)
+            if let value = try? container.decode(T.From.self, forKey: codingKey) {
+                self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decodeIfPresent(T.From.self, forKey: altCodingKey) {
+                self.wrappedValue = T.transformFromJSON(value: value)
+            } else if let value = try? container.decode([String:Any].self, forKey: codingKey) {
+                self.wrappedValue = value
+            } else if let value = try? container.decodeIfPresent([String:Any].self, forKey: altCodingKey) {
+                self.wrappedValue = value
+            } else {
+                self.wrappedValue = T.transformFromJSON(value: nil)
+            }
+            
+        } else {
+            self.wrappedValue = T.transformFromJSON(value: nil)
+        }
+    }
+}

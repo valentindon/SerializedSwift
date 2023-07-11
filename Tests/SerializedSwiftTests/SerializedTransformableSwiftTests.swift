@@ -26,42 +26,42 @@ final class SerializedTransformableSwiftTests: XCTestCase {
     
     func testTransformable() {
 
-//        class User: Serializable {
-//            @SerializedTransformable<StringToNumber>("height")
-//            var height: Int?
-//            
-//            @SerializedTransformable<StringToNumber>("age")
-//            var age: Int?
-//            
-//            required init() {}
-//        }
-//        
-//        let json = """
-//          {
-//              "age": "18",
-//              "height": "asd"
-//          }
-//          """
-//        guard let data = json.data(using: .utf8) else {
-//            XCTFail()
-//            return
-//        }
-//        
-//        do {
-//            let user = try JSONDecoder().decode(User.self, from: data)
-//            
-//            XCTAssertEqual(user.age, 18)
-//            XCTAssertEqual(user.height, nil)
-//            
-//            let json = try JSONEncoder().encode(user)
-//            let newUser = try JSONDecoder().decode(User.self, from: json)
-//            
-//            XCTAssertEqual(newUser.age, 18)
-//            XCTAssertEqual(newUser.height, nil)
-//            
-//        } catch {
-//            XCTFail()
-//        }
+        class User: Serializable {
+            @SerializedTransformable<StringToNumber>("height")
+            var height: Int?
+            
+            @SerializedTransformable<StringToNumber>("age")
+            var age: Int?
+            
+            required init() {}
+        }
+        
+        let json = """
+          {
+              "age": "18",
+              "height": "asd"
+          }
+          """
+        guard let data = json.data(using: .utf8) else {
+            XCTFail()
+            return
+        }
+        
+        do {
+            let user = try JSONDecoder().decode(User.self, from: data)
+            
+            XCTAssertEqual(user.age, 18)
+            XCTAssertEqual(user.height, nil)
+            
+            let json = try JSONEncoder().encode(user)
+            let newUser = try JSONDecoder().decode(User.self, from: json)
+            
+            XCTAssertEqual(newUser.age, 18)
+            XCTAssertEqual(newUser.height, nil)
+            
+        } catch {
+            XCTFail()
+        }
     }
     
     

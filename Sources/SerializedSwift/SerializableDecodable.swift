@@ -128,21 +128,27 @@ public extension SerializableDecodable {
             
             if let decodableProperty = rawProperty as? DecodableProperty {
                 let propertyName = String( property.name.dropFirst())
+                
                 try decodableProperty.decodeValue(from: container, propertyName: propertyName)
             }else if let decodableProperty = rawProperty as? DictionaryDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
+                
                 try decodableProperty.decodeValue(from: container, propertyName: propertyName)
             }else if let decodableProperty = rawProperty as? OptionalDictionaryDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
+                
                 try decodableProperty.decodeValue(from: container, propertyName: propertyName)
             }else if let decodableProperty = rawProperty as? ArrayDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
+                
                 try decodableProperty.decodeValue(from: container, propertyName: propertyName)
             }else if let decodableProperty = rawProperty as? OptionalArrayDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
+                
                 try decodableProperty.decodeValue(from: container, propertyName: propertyName)
             }else {
-                print("lost:", property.name)
+//                print("continue:", property.name)
+                continue
             }
             
             
