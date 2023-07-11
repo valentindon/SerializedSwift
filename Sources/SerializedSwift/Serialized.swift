@@ -87,7 +87,7 @@ extension Serialized: EncodableProperty where T: Encodable {
 extension Serialized: DictionaryEncodableProperty  where T == Dictionary<String, Any> {
     public func encodeValue(from container: inout EncodeContainer, propertyName: String) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
-        try container.encodeIfPresent(wrappedValue, forKey: codingKey)
+        try container.encode(wrappedValue, forKey: codingKey)
     }
     
    
@@ -95,6 +95,25 @@ extension Serialized: DictionaryEncodableProperty  where T == Dictionary<String,
 
 // Реализация для поддержки Optional<Dictionary<String, Any>>
 extension Serialized: OptionalDictionaryEncodableProperty where T == Dictionary<String, Any>? {
+    public func encodeValue(from container: inout EncodeContainer, propertyName: String) throws {
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        try container.encodeIfPresent(wrappedValue, forKey: codingKey)
+    }
+    
+   
+}
+
+extension Serialized: ArrayEncodableProperty  where T == Array<Any> {
+    public func encodeValue(from container: inout EncodeContainer, propertyName: String) throws {
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        try container.encode(wrappedValue, forKey: codingKey)
+    }
+    
+   
+}
+
+// Реализация для поддержки Optional<Dictionary<String, Any>>
+extension Serialized: OptionalArrayEncodableProperty where T == Array<Any>? {
     public func encodeValue(from container: inout EncodeContainer, propertyName: String) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         try container.encodeIfPresent(wrappedValue, forKey: codingKey)
@@ -188,12 +207,55 @@ extension Serialized: OptionalDictionaryDecodableProperty where T == Dictionary<
         
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
-        if  let value = try? container.decodeIfPresent([String: Any].self, forKey: codingKey) {
+        if  let value = try? container
+            .decodeIfPresent([String: Any].self, forKey: codingKey) {
             wrappedValue = value
         }  else {
             guard let altKey = alternateKey else { return }
             let altCodingKey = SerializedCodingKeys(key: altKey)
             if let value = try? container.decodeIfPresent([String: Any].self, forKey: altCodingKey) {
+                wrappedValue = value
+            }
+        }
+        
+       
+    }
+
+}
+
+extension Serialized: ArrayDecodableProperty where T == Array<Any> {
+    
+    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
+        if  let value = try? container.decode(T.self, forKey: codingKey) {
+            wrappedValue = value
+        }  else {
+            guard let altKey = alternateKey else { return }
+            let altCodingKey = SerializedCodingKeys(key: altKey)
+            if let value = try? container.decodeIfPresent(T.self, forKey: altCodingKey) {
+                wrappedValue = value
+            }
+        }
+        
+       
+    }
+
+}
+
+extension Serialized: OptionalArrayDecodableProperty where T == Array<Any>? {
+    
+    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+        
+        let codingKey = SerializedCodingKeys(key: key ?? propertyName)
+        
+        if  let value = try? container.decodeIfPresent([Any].self, forKey: codingKey) {
+            wrappedValue = value
+        }  else {
+            guard let altKey = alternateKey else { return }
+            let altCodingKey = SerializedCodingKeys(key: altKey)
+            if let value = try? container.decodeIfPresent([Any].self, forKey: altCodingKey) {
                 wrappedValue = value
             }
         }

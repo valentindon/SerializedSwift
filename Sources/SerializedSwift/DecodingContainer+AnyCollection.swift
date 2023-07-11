@@ -7,10 +7,8 @@
 //
 
 import Foundation
-
-
+public 
 extension KeyedDecodingContainer {
-    typealias K = SerializedCodingKeys
     /// Decodes a value of the given type for the given key.
     ///
     /// - parameter type: The type of value to decode.
@@ -23,7 +21,7 @@ extension KeyedDecodingContainer {
     ///   for the given key.
     /// - throws: `DecodingError.valueNotFound` if `self` has a null entry for
     ///   the given key.
-    public func decode(_ type: [Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [Any] {
+    func decode(_ type: [Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [Any] {
         var values = try nestedUnkeyedContainer(forKey: key)
         return try values.decode(type)
     }
@@ -40,8 +38,8 @@ extension KeyedDecodingContainer {
     ///   for the given key.
     /// - throws: `DecodingError.valueNotFound` if `self` has a null entry for
     ///   the given key.
-    public func decode(_ type: [String: Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [String: Any] {
-        let values = try nestedContainer(keyedBy: K.self, forKey: key)
+    func decode(_ type: [String: Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [String: Any] {
+        let values = try nestedContainer(keyedBy: SerializedCodingKeys.self, forKey: key)
         return try values.decode(type)
     }
 
@@ -58,7 +56,7 @@ extension KeyedDecodingContainer {
     ///   the value is a null value.
     /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
     ///   is not convertible to the requested type.
-    public func decodeIfPresent(_ type: [Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [Any]? {
+    func decodeIfPresent(_ type: [Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [Any]? {
         guard contains(key),
             try decodeNil(forKey: key) == false else { return nil }
         return try decode(type, forKey: key)
@@ -77,7 +75,7 @@ extension KeyedDecodingContainer {
     ///   the value is a null value.
     /// - throws: `DecodingError.typeMismatch` if the encountered encoded value
     ///   is not convertible to the requested type.
-    public func decodeIfPresent(_ type: [String: Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [String: Any]? {
+    func decodeIfPresent(_ type: [String: Any].Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> [String: Any]? {
         guard contains(key),
             try decodeNil(forKey: key) == false else { return nil }
         return try decode(type, forKey: key)
@@ -109,7 +107,6 @@ private extension KeyedDecodingContainer {
 }
 
 private extension UnkeyedDecodingContainer {
-    typealias K = SerializedCodingKeys
     mutating func decode(_ type: [Any].Type) throws -> [Any] {
         var elements: [Any] = []
         while !isAtEnd {
@@ -123,7 +120,7 @@ private extension UnkeyedDecodingContainer {
                 elements.append(double)
             } else if let string = try? decode(String.self) {
                 elements.append(string)
-            } else if let values = try? nestedContainer(keyedBy: K.self),
+            } else if let values = try? nestedContainer(keyedBy: SerializedCodingKeys.self),
                 let element = try? values.decode([String: Any].self) {
                 elements.append(element)
             } else if var values = try? nestedUnkeyedContainer(),

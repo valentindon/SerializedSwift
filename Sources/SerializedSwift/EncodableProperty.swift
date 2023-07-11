@@ -31,3 +31,15 @@ public protocol OptionalDictionaryEncodableProperty {
 
     func encodeValue(from container: inout EncodeContainer, propertyName: String) throws
 }
+
+public protocol ArrayEncodableProperty {
+    typealias EncodeContainer = KeyedEncodingContainer<SerializedCodingKeys>
+
+    func encodeValue(from container: inout EncodeContainer, propertyName: String) throws
+}
+
+public protocol OptionalArrayEncodableProperty {
+    typealias EncodeContainer = KeyedEncodingContainer<SerializedCodingKeys>
+
+    func encodeValue(from container: inout EncodeContainer, propertyName: String) throws
+}

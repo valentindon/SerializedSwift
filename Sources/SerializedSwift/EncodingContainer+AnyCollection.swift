@@ -5,18 +5,16 @@
 //  Created by ShopBack on 1/19/19.
 //  Copyright © 2019 levantAJ. All rights reserved.
 //
-
 import Foundation
-
+public
 extension KeyedEncodingContainer {
-    typealias K = SerializedCodingKeys
     /// Encodes the given value for the given key.
     ///
     /// - parameter value: The value to encode.
     /// - parameter key: The key to associate the value with.
     /// - throws: `EncodingError.invalidValue` if the given value is invalid in
     ///   the current context for this format.
-    public mutating func encode(_ value: [String: Any], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [String: Any], forKey key: KeyedEncodingContainer<K>.Key) throws {
         var container = nestedContainer(keyedBy: SerializedCodingKeys.self, forKey: key)
         try container.encode(value)
     }
@@ -27,7 +25,7 @@ extension KeyedEncodingContainer {
     /// - parameter key: The key to associate the value with.
     /// - throws: `EncodingError.invalidValue` if the given value is invalid in
     ///   the current context for this format.
-    public mutating func encode(_ value: [Any], forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encode(_ value: [Any], forKey key: KeyedEncodingContainer<K>.Key) throws {
         var container = nestedUnkeyedContainer(forKey: key)
         try container.encode(value)
     }
@@ -38,7 +36,7 @@ extension KeyedEncodingContainer {
     /// - parameter key: The key to associate the value with.
     /// - throws: `EncodingError.invalidValue` if the given value is invalid in
     ///   the current context for this format.
-    public mutating func encodeIfPresent(_ value: [String: Any]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encodeIfPresent(_ value: [String: Any]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             var container = nestedContainer(keyedBy: SerializedCodingKeys.self, forKey: key)
             try container.encode(value)
@@ -53,7 +51,7 @@ extension KeyedEncodingContainer {
     /// - parameter key: The key to associate the value with.
     /// - throws: `EncodingError.invalidValue` if the given value is invalid in
     ///   the current context for this format.
-    public mutating func encodeIfPresent(_ value: [Any]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
+    mutating func encodeIfPresent(_ value: [Any]?, forKey key: KeyedEncodingContainer<K>.Key) throws {
         if let value = value {
             var container = nestedUnkeyedContainer(forKey: key)
             try container.encode(value)
@@ -91,7 +89,6 @@ private extension KeyedEncodingContainer where K == SerializedCodingKeys {
 }
 
 private extension UnkeyedEncodingContainer {
-    typealias K = SerializedCodingKeys
     /// Encodes the given value.
     ///
     /// - parameter value: The value to encode.
@@ -127,7 +124,7 @@ private extension UnkeyedEncodingContainer {
     /// - throws: `EncodingError.invalidValue` if the given value is invalid in
     ///   the current context for this format.
     mutating func encode(_ value: [String: Any]) throws {
-        var container = self.nestedContainer(keyedBy: K.self)
+        var container = self.nestedContainer(keyedBy: SerializedCodingKeys.self)
         try container.encode(value)
     }
 }

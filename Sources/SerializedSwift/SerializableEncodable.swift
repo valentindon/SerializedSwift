@@ -86,10 +86,19 @@ public extension SerializableEncodable {
             guard let rawProperty = try? property.get(from: self) else {continue}
             let propertyName = String( property.name.dropFirst())
             if let encodableProperty = rawProperty as? EncodableProperty {
+                let propertyName = String( property.name.dropFirst())
                 try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
             }else if let encodableProperty = rawProperty as? DictionaryEncodableProperty {
+                let propertyName = String( property.name.dropFirst())
                 try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
             }else if let encodableProperty = rawProperty as? OptionalDictionaryEncodableProperty {
+                let propertyName = String( property.name.dropFirst())
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }else if let encodableProperty = rawProperty as? ArrayEncodableProperty {
+                let propertyName = String( property.name.dropFirst())
+                try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
+            }else if let encodableProperty = rawProperty as? OptionalArrayEncodableProperty {
+                let propertyName = String( property.name.dropFirst())
                 try encodableProperty.encodeValue(from: &container, propertyName: propertyName)
             }
         }

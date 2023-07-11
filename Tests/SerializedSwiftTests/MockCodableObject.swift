@@ -34,3 +34,26 @@ struct MockCodableObject: Codable {
         try container.encode(array, forKey: .array)
     }
 }
+
+struct MockCodableTemplateData: Codable {
+    var templateData: [String: Any]
+    
+    enum CodingKeys: String, CodingKey {
+        case templateData
+    }
+    
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        templateData = try values.decode([String: Any].self, forKey: .templateData)
+        
+    }
+
+    init(dict: [String: Any]) {
+        self.templateData = dict
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(templateData, forKey: .templateData)
+    }
+}

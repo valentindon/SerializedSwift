@@ -27,3 +27,13 @@ public protocol OptionalDictionaryDecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
     func decodeValue(from container: DecodeContainer, propertyName: String) throws
 }
+
+public protocol ArrayDecodableProperty {
+    typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
+    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+}
+
+public protocol OptionalArrayDecodableProperty {
+    typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
+    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+}
