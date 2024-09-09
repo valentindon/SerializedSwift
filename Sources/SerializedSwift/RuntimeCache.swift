@@ -52,6 +52,12 @@ class RuntimeCache {
             return typeInfo
         }
     }
+    
+    func clearCache() {
+        synchronized(self) {
+            cache.removeAll()
+        }
+    }
 }
 
 @discardableResult

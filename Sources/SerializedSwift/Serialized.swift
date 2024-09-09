@@ -25,6 +25,11 @@ public protocol SerializedProtocol {
     func getType<T>()-> T.Type
 }
 
+
+public func clearCache() {
+    RuntimeCache.shared.clearCache()
+}
+
 @propertyWrapper
 /// Property wrapper for Serializable (Encodable + Decodable) properties.
 /// The Object itself must conform to Serializable (or SerializableEncodable / SerializableDecodable)
