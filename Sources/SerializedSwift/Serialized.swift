@@ -22,7 +22,7 @@ extension Array: AnyTypeOfArray {}
 public protocol SerializedProtocol {
     var key: String? {get}
     var alternateKey: String? {get}
-    func getType<T>()-> T.Type
+    func getType<T>() -> T.Type
 }
 
 
@@ -34,7 +34,7 @@ public func clearCache() {
 /// Property wrapper for Serializable (Encodable + Decodable) properties.
 /// The Object itself must conform to Serializable (or SerializableEncodable / SerializableDecodable)
 /// Default value is by default nil. Can be used directly without arguments
-public final class Serialized<T>:SerializedProtocol {
+public class Serialized<T>:SerializedProtocol {
     public private(set)var key: String?
     public private(set)var alternateKey: String?
     
@@ -58,8 +58,8 @@ public final class Serialized<T>:SerializedProtocol {
         }
     }
     
-    public func getType<T>() -> T.Type {
-        return T.self
+    public func getType<U>() -> U.Type {
+        return U.self
     }
     
     /// Defualt init for Serialized wrapper
@@ -135,7 +135,7 @@ extension Serialized: DecodableProperty where T: Decodable {
     ///   - container: The decoding container
     ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
     /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
@@ -145,11 +145,20 @@ extension Serialized: DecodableProperty where T: Decodable {
             wrappedValue = value
         } else if T.self is Double.Type, let floatValue = try? container.decode(Float.self, forKey: codingKey), let value = Double(floatValue) as? T {
             wrappedValue = value
+        } else if T.self is Int.Type, let doubleValue = try? container.decode(Double.self, forKey: codingKey), let value = Int(doubleValue) as? T, doubleValue.truncatingRemainder(dividingBy: 1) == 0  {
+            wrappedValue = value
+        } else if T.self is Int.Type, let floatValue = try? container.decode(Float.self, forKey: codingKey), let value = Int(floatValue) as? T, floatValue.truncatingRemainder(dividingBy: 1) == 0  {
+            wrappedValue = value
         } else {
-            guard let altKey = alternateKey else { return }
+            guard let altKey = alternateKey else {
+                print("!!! skip decode:", propertyName, ownerType)
+                return
+            }
             let altCodingKey = SerializedCodingKeys(key: altKey)
             if let value = try? container.decodeIfPresent(T.self, forKey: altCodingKey) {
                 wrappedValue = value
+            }else {
+                print("!!! skip decode:", propertyName, ownerType)
             }
         }
         
@@ -187,7 +196,7 @@ extension Serialized: DecodableProperty where T: Decodable {
 /// Decodable support
 extension Serialized: DictionaryDecodableProperty where T == Dictionary<String, Any>, T.Key == String {
     
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
@@ -208,7 +217,7 @@ extension Serialized: DictionaryDecodableProperty where T == Dictionary<String, 
 
 extension Serialized: OptionalDictionaryDecodableProperty where T == Dictionary<String, Any>? {
     
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
@@ -230,7 +239,7 @@ extension Serialized: OptionalDictionaryDecodableProperty where T == Dictionary<
 
 extension Serialized: ArrayDecodableProperty where T == Array<Any> {
     
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
@@ -251,7 +260,7 @@ extension Serialized: ArrayDecodableProperty where T == Array<Any> {
 
 extension Serialized: OptionalArrayDecodableProperty where T == Array<Any>? {
     
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
@@ -372,7 +381,7 @@ extension SerializedDecodable: DecodableProperty where T: Decodable {
     ///   - container: The decoding container
     ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
     /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         if T.self is AnyTypeOfArray.Type, let value = try? container.decode(T.self, forKey: codingKey) {
             wrappedValue = value

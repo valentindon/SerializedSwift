@@ -10,21 +10,26 @@ import Runtime
 
 internal struct HashedType : Hashable
 {
-    public let hashValue: Int
+    private let typeHash: Int
 
     public init(_ type: Any.Type)
     {
-        hashValue = unsafeBitCast(type, to: Int.self)
+        typeHash = unsafeBitCast(type, to: Int.self)
+        
     }
 
     public init<T>(_ pointer: UnsafePointer<T>)
     {
-        hashValue = pointer.hashValue
+        typeHash = pointer.hashValue
     }
 
     public static func == (lhs: HashedType, rhs: HashedType) -> Bool
     {
         return lhs.hashValue == rhs.hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(typeHash)  
     }
 }
 

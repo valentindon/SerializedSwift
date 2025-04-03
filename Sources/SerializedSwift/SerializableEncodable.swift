@@ -13,7 +13,9 @@ import Runtime
 //
 //
 
-public protocol SerializableEncodable: Encodable, KeyValueCoding {}
+public protocol SerializableEncodable: Encodable, KeyValueCoding {
+    init()
+}
 
 //
 //

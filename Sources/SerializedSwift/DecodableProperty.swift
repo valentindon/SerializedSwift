@@ -15,25 +15,25 @@ import Foundation
 
 public protocol DecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
-    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+    func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws
 }
 
 public protocol DictionaryDecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
-    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+    func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws
 }
 
 public protocol OptionalDictionaryDecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
-    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+    func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws
 }
 
 public protocol ArrayDecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
-    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+    func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws
 }
 
 public protocol OptionalArrayDecodableProperty {
     typealias DecodeContainer = KeyedDecodingContainer<SerializedCodingKeys>
-    func decodeValue(from container: DecodeContainer, propertyName: String) throws
+    func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws
 }

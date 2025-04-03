@@ -47,7 +47,7 @@ extension SerializedTransformable: DecodableProperty where T.From: Decodable, T.
     ///   - container: The decoding container
     ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
     /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
         if let value = try? container.decode(T.From.self, forKey: codingKey) {
@@ -86,7 +86,7 @@ extension SerializedTransformable: DictionaryDecodableProperty where T.From: Dec
     ///   - container: The decoding container
     ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
     /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
         if let value = try? container.decode(T.From.self, forKey: codingKey) {
@@ -126,7 +126,7 @@ extension SerializedTransformable: OptionalDictionaryDecodableProperty where T.F
     ///   - container: The decoding container
     ///   - propertyName: The property name of the Wrapped property. Used if no key (or nil) is present
     /// - Throws: Doesnt throws anything; Sets the wrappedValue to nil instead (possible crash for non-optionals if no default value was set)
-    public func decodeValue(from container: DecodeContainer, propertyName: String) throws {
+    public func decodeValue(from container: DecodeContainer, propertyName: String, ownerType: Any.Type) throws {
         let codingKey = SerializedCodingKeys(key: key ?? propertyName)
         
         if let value = try? container.decode(T.From.self, forKey: codingKey) {

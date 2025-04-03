@@ -57,7 +57,7 @@ public extension SerializableDecodable {
                 // in the form: "_name". Dropping the "_" -> "name"
                 let propertyName = String((child.label ?? "").dropFirst())
                 
-                try decodableKey.decodeValue(from: container, propertyName: propertyName)
+                try decodableKey.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
             }
             mirror = mirror?.superclassMirror
         } while mirror != nil
@@ -88,7 +88,7 @@ public extension SerializableDecodable {
             
             let propertyName = keyName.hasPrefix("_") ? String(keyName.dropFirst()) : keyName
             
-            try? decodableProperty.decodeValue(from: container, propertyName: propertyName)
+            try? decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
         }
     
         
@@ -109,7 +109,7 @@ public extension SerializableDecodable {
                     return
                 }
                 let propertyName = String(propertyName.dropFirst())
-                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
                 
             }
         }
@@ -129,24 +129,24 @@ public extension SerializableDecodable {
             if let decodableProperty = rawProperty as? DecodableProperty {
                 let propertyName = String( property.name.dropFirst())
                 
-                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-            }else if let decodableProperty = rawProperty as? DictionaryDecodableProperty {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
+            } else if let decodableProperty = rawProperty as? DictionaryDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
                 
-                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-            }else if let decodableProperty = rawProperty as? OptionalDictionaryDecodableProperty {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
+            } else if let decodableProperty = rawProperty as? OptionalDictionaryDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
                 
-                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-            }else if let decodableProperty = rawProperty as? ArrayDecodableProperty {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
+            } else if let decodableProperty = rawProperty as? ArrayDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
                 
-                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-            }else if let decodableProperty = rawProperty as? OptionalArrayDecodableProperty {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
+            } else if let decodableProperty = rawProperty as? OptionalArrayDecodableProperty {
                 let propertyName = String( property.name.dropFirst())
                 
-                try decodableProperty.decodeValue(from: container, propertyName: propertyName)
-            }else {
+                try decodableProperty.decodeValue(from: container, propertyName: propertyName, ownerType: type(of: self))
+            } else {
 //                print("continue:", property.name)
                 continue
             }
