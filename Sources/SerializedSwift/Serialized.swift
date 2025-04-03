@@ -151,14 +151,18 @@ extension Serialized: DecodableProperty where T: Decodable {
             wrappedValue = value
         } else {
             guard let altKey = alternateKey else {
-                print("!!! skip decode:", propertyName, ownerType)
+                #if DEBUG
+//                print("!!! skip decode:", propertyName, ownerType)
+                #endif
                 return
             }
             let altCodingKey = SerializedCodingKeys(key: altKey)
             if let value = try? container.decodeIfPresent(T.self, forKey: altCodingKey) {
                 wrappedValue = value
             }else {
-                print("!!! skip decode:", propertyName, ownerType)
+                #if DEBUG
+//                print("!!! skip decode:", propertyName, ownerType)
+                #endif
             }
         }
         
